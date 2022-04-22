@@ -11,20 +11,17 @@ import { GtagUserTiming } from '../interface/gtag-user-timing';
 import { GtagCommandService } from './gtag-command.service';
 import { GtagConstantService } from './gtap-constant.service';
 
-
 @Injectable({
 	providedIn: 'root',
 })
-export class GtagAPIService extends GtagCommandService {
+export class GtagAPIService {
 	private _globalGtagConfig: GtagConfig;
 
-  constructor(
-    @Inject('config') config: GtagConfig,
-    private _router: Router
-  ) {
-    
-		super();
-
+	constructor(
+		@Inject('config') config: GtagConfig,
+		private _gtagCmd: GtagCommandService,
+		private _router: Router
+	) {
 		this._globalGtagConfig = { trackPageviews: true, ...config };
 		if (this._globalGtagConfig.trackPageviews) {
 			_router.events
@@ -46,7 +43,7 @@ export class GtagAPIService extends GtagCommandService {
 
 	public sendConfigurationData(params: any): void {
 		try {
-			this.config(this._globalGtagConfig?.trackingId, params);
+			this._gtagCmd.config(this._globalGtagConfig?.trackingId, params);
 		} catch (err) {
 			console.error('Google Analytics config error', err);
 		}
@@ -68,7 +65,7 @@ export class GtagAPIService extends GtagCommandService {
 			};
 
 			params = { ...defaults, ...params };
-			this.config(this._globalGtagConfig?.trackingId, params);
+			this._gtagCmd.config(this._globalGtagConfig?.trackingId, params);
 			this.debug('pageview', this._globalGtagConfig?.trackingId, params);
 		} catch (err) {
 			console.error('Google Analytics pageview error', err);
@@ -84,7 +81,7 @@ export class GtagAPIService extends GtagCommandService {
 	public sendEventData(event: GtagEvent): void {
 		try {
 			let { action, ...params } = event;
-			this.event(action, params);
+			this._gtagCmd.event(action, params);
 			this.debug(
 				'event',
 				this._globalGtagConfig?.trackingId,
@@ -105,7 +102,7 @@ export class GtagAPIService extends GtagCommandService {
 	 */
 	public sendPhoneAnalyticsData(params: GtagPhoneAnalytics): void {
 		try {
-			this.set(params);
+			this._gtagCmd.set(params);
 		} catch (err) {
 			console.error('Google Analytics phone analytics error', err);
 		}
@@ -121,7 +118,7 @@ export class GtagAPIService extends GtagCommandService {
 	 */
 	public sendUserTimingData(usertiming: GtagUserTiming): void {
 		try {
-			this.event(GtagConstantService.TIMING_COMPLETE_EVENT, usertiming);
+			this._gtagCmd.event(GtagConstantService.TIMING_COMPLETE_EVENT, usertiming);
 		} catch (err) {
 			console.error('Google Analytics usertiming error', err);
 		}
@@ -136,7 +133,7 @@ export class GtagAPIService extends GtagCommandService {
 	 */
 	public sendExceptionData(exception: GtagException = {}): void {
 		try {
-			this.event(GtagConstantService.EXCEPTION_EVENT, exception);
+			this._gtagCmd.event(GtagConstantService.EXCEPTION_EVENT, exception);
 		} catch (err) {
 			console.error('Google Analytics exception error', err);
 		}
