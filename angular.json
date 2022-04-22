@@ -3,5 +3,37 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-  }
+    "ngx-gtag": {
+      "projectType": "library",
+      "root": "projects/ngx-gtag",
+      "sourceRoot": "projects/ngx-gtag/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/ngx-gtag/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-gtag/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-gtag/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-gtag/src/test.ts",
+            "tsConfig": "projects/ngx-gtag/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-gtag/karma.conf.js"
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ngx-gtag"
 }
